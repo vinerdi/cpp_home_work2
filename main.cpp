@@ -75,4 +75,10 @@ int main() {
     queue.enqueue(4);
     queue.enqueue(5);
 
+    while (!queue.isEmpty()) {
+        std::cout << queue.dequeue() << " ";
+    }
+    std::cout << std::endl;
+
+    return 0;
 }
