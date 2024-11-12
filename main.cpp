@@ -1,34 +1,58 @@
-#include <iostream>
-
 template <typename T>
-class Node {
-public:
-    T data;
-    Node* next;
-    Node* prev;
-
-    Node(T value) : data(value), next(nullptr), prev(nullptr) {}
-};
-
-template <typename T>
-class Queue {
+class DoublyLinkedList {
 private:
     Node<T>* head;
     Node<T>* tail;
-    int size;
 
 public:
-    Queue() : head(nullptr), tail(nullptr), size(0) {}
+    DoublyLinkedList() : head(nullptr), tail(nullptr) {}
 
-    ~Queue() {
-        while (head != nullptr) {
-            Node<T>* temp = head;
-            head = head->next;
-            delete temp;
+    // Клонування списку
+    Node<T>* clone() const {
+        if (head == nullptr) return nullptr;
+        Node<T>* newHead = new Node<T>(head->data);
+        Node<T>* current = head->next;
+        Node<T>* newCurrent = newHead;
+        while (current != nullptr) {
+            newCurrent->next = new Node<T>(current->data);
+            newCurrent->next->prev = newCurrent;
+            newCurrent = newCurrent->next;
+            current = current->next;
         }
+        return newHead;
     }
 
-    void enqueue(T value) {
+    // Перевантаження оператора +
+    DoublyLinkedList operator+(const DoublyLinkedList& other) const {
+        DoublyLinkedList result;
+        Node<T>* current = head;
+        while (current != nullptr) {
+            result.append(current->data);
+            current = current->next;
+        }
+        current = other.head;
+        while (current != nullptr) {
+            result.append(current->data);
+            current = current->next;
+        }
+        return result;
+    }
+
+    // Перевантаження оператора *
+    DoublyLinkedList operator*(const DoublyLinkedList& other) const {
+        DoublyLinkedList result;
+        Node<T>* current = head;
+        while (current != nullptr) {
+            if (other.contains(current->data)) {
+                result.append(current->data);
+            }
+            current = current->next;
+        }
+        return result;
+    }
+
+    // Допоміжні функції
+    void append(T value) {
         Node<T>* newNode = new Node<T>(value);
         if (tail != nullptr) {
             tail->next = newNode;
@@ -38,36 +62,33 @@ public:
         if (head == nullptr) {
             head = newNode;
         }
-        size++;
     }
 
-    T dequeue() {
-        if (head == nullptr) {
-            throw std::out_of_range("Queue is empty");
+    bool contains(T value) const {
+        Node<T>* current = head;
+        while (current != nullptr) {
+            if (current->data == value) {
+                return true;
+            }
+            current = current->next;
         }
-        Node<T>* temp = head;
-        T value = head->data;
-        head = head->next;
-        if (head != nullptr) {
-            head->prev = nullptr;
-        } else {
-            tail = nullptr;
-        }
-        delete temp;
-        size--;
-        return value;
-    }
-
-    bool isEmpty() const {
-        return size == 0;
-    }
-
-    int getSize() const {
-        return size;
+        return false;
     }
 };
 
 int main() {
+	DoublyLinkedList<int> list1;
+	list1.append(1);
+	list1.append(2);
+	list1.append(3);
 
-    return 0;
+	DoublyLinkedList<int> list2;
+	list2.append(2);
+	list2.append(3);
+	list2.append(4);
+
+	DoublyLinkedList<int> list3 = list1 + list2;
+	DoublyLinkedList<int> list4 = list1 * list2;
+
+	return 0;
 }
